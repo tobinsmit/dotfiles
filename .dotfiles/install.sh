@@ -7,6 +7,12 @@
 # - clone the repository to $HOME/.dotfiles
 # - set up the 'dotfiles' alias for management
 
+# Check if we're running from within the .dotfiles directory
+if [[ "$(pwd)" == "$HOME/.dotfiles" ]]; then
+  warn "You are currently in the .dotfiles directory."
+  warn "Please run this script from outside the .dotfiles directory."
+  abort "Change to a different directory and try again."
+fi
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # shellcheck disable=SC2312
@@ -158,7 +164,7 @@ clone_repo() {
   dotfiles() {
     git --git-dir="$DOTFILES_DIR/.git" --work-tree="$HOME" "$@"
   }
-  git clone "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR" --no-checkout
+  git clone --bare "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR/.git"
   dotfiles config --local status.showUntrackedFiles no
   dotfiles checkout
 }
