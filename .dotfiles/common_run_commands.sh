@@ -53,8 +53,9 @@ else
 fi
 
 # Syntax highlighting
-if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-    source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+zsh_high_path="$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if [ -f "$zsh_high_path" ]; then
+    source "$zsh_high_path"
 else
     echo "zsh-syntax-highlighting not found.\nCan install with\n\tbrew install zsh-syntax-highlighting"
 fi
