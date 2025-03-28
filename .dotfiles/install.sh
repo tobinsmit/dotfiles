@@ -201,7 +201,7 @@ setup_run_commands() {
     echo "source $DOTFILES_DIR/common_run_commands.sh" >> "$SHELL_CONFIG"
     echo "✅ Added source command to $SHELL_CONFIG"
   else
-    echo "ℹ️ Source command already exists in $SHELL_CONFIG"
+    echo "✅ Source command already exists in $SHELL_CONFIG"
   fi
 }
 
