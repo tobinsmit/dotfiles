@@ -48,9 +48,13 @@ alias dotfiles='git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
 # Fuzzy finder (fzf)
 if which fzf >/dev/null 2>&1; then
     source <(fzf --zsh)
+else
+    echo "fzf not found.\nCan install with\n\tbrew install fzf"
 fi
 
 # Syntax highlighting
 if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
     source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+else
+    echo "zsh-syntax-highlighting not found.\nCan install with\n\tbrew install zsh-syntax-highlighting"
 fi
