@@ -155,10 +155,12 @@ clone_repo() {
     fi
   fi
   
-  alias dotfiles="git --git-dir=$DOTFILES_DIR/.git --work-tree=$HOME"
+  dotfiles() {
+    git --git-dir="$DOTFILES_DIR/.git" --work-tree="$HOME" "$@"
+  }
   git clone "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR" --no-checkout
   dotfiles config --local status.showUntrackedFiles no
-  dotfiles checkout
+  dotfiles checkout main
 }
 
 # Set up run commands
