@@ -141,7 +141,7 @@ clone_repo() {
   ohai "Cloning dotfiles repository..."
   if [ -d "$DOTFILES_DIR" ]; then
     warn "Directory $DOTFILES_DIR already exists!"
-    echo "Would you like to remove it and clone again? (y/n)"
+    echo -n "Would you like to remove it and clone again? (y/n) "
     if [[ -z "${NONINTERACTIVE-}" ]]; then
       read -r response
       if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -160,7 +160,7 @@ clone_repo() {
   }
   git clone "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR" --no-checkout
   dotfiles config --local status.showUntrackedFiles no
-  dotfiles checkout main
+  dotfiles checkout
 }
 
 # Set up run commands
