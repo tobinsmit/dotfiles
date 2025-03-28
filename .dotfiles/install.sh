@@ -118,14 +118,20 @@ backup_existing_dotfiles() {
   mkdir -p "$BACKUP_DIR"
   
   # List of common dotfiles to back up
-  dotfiles=(".zshrc" ".bashrc" ".gitconfig" ".vimrc" ".tmux.conf" ".profile")
+  common_dotfiles=(".zshrc" ".bashrc" ".gitconfig" ".vimrc" ".tmux.conf" ".profile")
   
-  for file in "${dotfiles[@]}"; do
+  for file in "${common_dotfiles[@]}"; do
     if [ -f "$HOME/$file" ]; then
       echo "  Backing up $file"
       cp "$HOME/$file" "$BACKUP_DIR/"
     fi
   done
+
+  # Backup the .dotfiles directory
+  if [ -d "$DOTFILES_DIR" ]; then
+    echo "  Backing up $DOTFILES_DIR"
+    cp -r "$DOTFILES_DIR" "$BACKUP_DIR/.dotfiles"
+  fi
   
   echo "✅ Backup created at $BACKUP_DIR"
 }
