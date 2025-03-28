@@ -7,13 +7,6 @@
 # - clone the repository to $HOME/.dotfiles
 # - set up the 'dotfiles' alias for management
 
-# Check if we're running from within the .dotfiles directory
-if [[ "$(pwd)" == "$HOME/.dotfiles" ]]; then
-  warn "You are currently in the .dotfiles directory."
-  warn "Please run this script from outside the .dotfiles directory."
-  abort "Change to a different directory and try again."
-fi
-
 # We don't need return codes for "$(command)", only stdout is needed.
 # shellcheck disable=SC2312
 
@@ -75,6 +68,13 @@ abort() {
   printf "${tty_red}Error${tty_reset}: %s\n" "$(chomp "$1")" >&2
   exit 1
 }
+
+# Check if we're running from within the .dotfiles directory
+if [[ "$(pwd)" == "$HOME/.dotfiles" ]]; then
+  warn "You are currently in the .dotfiles directory."
+  warn "Please run this script from outside the .dotfiles directory."
+  abort "Change to a different directory and try again."
+fi
 
 # Check if running in non-interactive mode
 if [[ -z "${NONINTERACTIVE-}" ]]
