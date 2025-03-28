@@ -95,7 +95,7 @@ wait_for_user() {
   
   local c
   echo
-  echo "Press ${tty_bold}RETURN${tty_reset}/${tty_bold}ENTER${tty_reset} to continue or any other key to abort:"
+  echo -n "Press ${tty_bold}RETURN${tty_reset}/${tty_bold}ENTER${tty_reset} to continue or any other key to abort: "
   getc c
   # we test for \r and \n because some stuff does \r instead
   if ! [[ "${c}" == $'\r' || "${c}" == $'\n' ]]
