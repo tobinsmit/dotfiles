@@ -167,6 +167,7 @@ clone_repo() {
   git clone --bare "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR/.git"
   dotfiles config --local status.showUntrackedFiles no
   dotfiles checkout
+  echo "✅ Cloned and configured"
 }
 
 # Set up run commands
