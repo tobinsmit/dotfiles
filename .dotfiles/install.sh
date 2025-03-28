@@ -15,7 +15,7 @@ set -e  # Exit on error
 set -u  # Treat unset variables as errors
 
 # Define variables
-DOTFILES_REPO="https://github.com/tobinsmit/dotfiles.git"
+DOTFILES_REPO_SOURCE="git@github.com:tobinsmit/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 NONINTERACTIVE=${NONINTERACTIVE:-}
@@ -155,13 +155,10 @@ clone_repo() {
     fi
   fi
   
-  git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
-
-}
-
-configure_git() {
-  ohai "Configuring git..."
-  git -C "$DOTFILES_DIR" config --local status.showUntrackedFiles no
+  alias dotfiles="git --git-dir=$DOTFILES_DIR/.git --work-tree=$HOME"
+  git clone --bare "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR"/.git
+  dotfiles config --local status.showUntrackedFiles no
+  dotfiles checkout
 }
 
 # Set up run commands
@@ -201,7 +198,7 @@ setup_run_commands() {
 }
 
 # Main execution
-ohai "This script will install dotfiles from $DOTFILES_REPO"
+ohai "This script will install dotfiles from $DOTFILES_REPO_SOURCE"
 ohai "It will:"
 echo "- Back up your existing $DOTFILES_DIR to $BACKUP_DIR"
 echo "- Clone and configure the repository to $DOTFILES_DIR"
@@ -214,7 +211,6 @@ fi
 main() {
   backup_existing_dotfiles
   clone_repo
-  configure_git
   setup_run_commands
   
   ohai "🎉 Dotfiles installation complete!"
