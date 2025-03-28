@@ -1,6 +1,8 @@
 # .zshrc: Run at start of every interactive shell
 # Typically used for shell setup, aliases, functions, prompts, key bindings etc
 
+MISSING_TOOLS=""
+
 # ----------------------------------------
 # Common aliases
 # ----------------------------------------
@@ -18,9 +20,8 @@ alias git-prune="git branch --v | grep '\[gone\]' | awk '{print \$1}' | xargs gi
 CLICOLOR=1
 export LSCOLORS=Exfxcxdxbxegedabagacad # see 'man zsh' for LSCOLORS`
 
-# Set up prompt with git integration if available
-if [ -f ~/.git-prompt.sh ]; then
-    source ~/.git-prompt.sh
+if [ -f "$HOME/.git-prompt.sh" ]; then
+    source "$HOME/.git-prompt.sh"
 
     function git_prompt() {
         __git_ps1 '%s ' | sed 's/.*\///'
@@ -29,11 +30,9 @@ if [ -f ~/.git-prompt.sh ]; then
     setopt PROMPT_SUBST ; PS1='%F{green}ts %B%F{cyan}%~ %b%F{yellow}$(git_prompt)%B%F{141}%# %f%b'
 else
     # Fallback to old prompt if git-prompt.sh is not available
+    MISSING_TOOLS="$MISSING_TOOLS  .git-prompt.sh \n"
     PS1='%F{green}ts %B%F{cyan}%~ %F{141}%# %f%b'
 fi
-
-# Zsh auto completion
-autoload -Uz compinit && compinit
 
 # ----------------------------------------
 # Dotfiles
@@ -45,11 +44,14 @@ alias dotfiles='git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
 # 3rd party add-ons
 # ----------------------------------------
 
+# Zsh auto completion
+autoload -Uz compinit && compinit
+
 # Fuzzy finder (fzf)
 if which fzf >/dev/null 2>&1; then
     source <(fzf --zsh)
 else
-    echo "fzf not found.\nCan install with\n\tbrew install fzf"
+    MISSING_TOOLS="$MISSING_TOOLS  fzf \n"
 fi
 
 # Syntax highlighting
@@ -57,5 +59,12 @@ zsh_high_path="$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlig
 if [ -f "$zsh_high_path" ]; then
     source "$zsh_high_path"
 else
-    echo "zsh-syntax-highlighting not found.\nCan install with\n\tbrew install zsh-syntax-highlighting"
+    MISSING_TOOLS="$MISSING_TOOLS  zsh-syntax-highlighting \n"
+fi
+
+if [ -n "$MISSING_TOOLS" ]; then
+    echo "\n🥵 Missing tools:"
+    echo "$MISSING_TOOLS"
+    echo "✨ To install missing tools, run:"
+    echo "  source ~/.dotfiles/install_tools.sh"
 fi
