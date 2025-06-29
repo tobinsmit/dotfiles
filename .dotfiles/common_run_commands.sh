@@ -42,39 +42,57 @@ tobin-prune() {
     echo "$branches" | xargs git branch -D
 }
 
-# Function to list git repositories and their current branches
-tobin-list-repos() {
-  local current_dir=$(pwd)
-    
-  echo "Repositories in $current_dir:"
-  echo "--------------------------"
-    
-  # Create a temporary file to store the output
-  local temp_file=$(mktemp)
-    
-  # Loop through each directory
-  for dir in */; do
-    # Remove trailing slash
-    repo=${dir%/}
-    
-    # Check if this is a git repository
-    if [ -d "$repo/.git" ]; then
-      # Get the current branch
-      cd "$repo"
-      branch=$(git branch --show-current)
-      echo "$repo\t$branch" >> "$temp_file"
-      cd ..
-    fi
-  done
-  
-  # Display the results in columns
-  column -t -s $'\t' "$temp_file"
-  
-  # Clean up
-  rm "$temp_file"
-  
-  # Return to original directory
-  cd "$current_dir"
+# # Function to list git repositories and their current branches
+# tobin-list-repos() {
+#   local current_dir=$(pwd)
+#
+#   echo "Repositories in $current_dir:"
+#   echo "--------------------------"
+#
+#   # Create a temporary file to store the output
+#   local temp_file=$(mktemp)
+#
+#   # Loop through each directory
+#   for dir in */; do
+#     # Remove trailing slash
+#     repo=${dir%/}
+#
+#     # Check if this is a git repository
+#     if [ -d "$repo/.git" ]; then
+#       # Get the current branch
+#       cd "$repo"
+#       branch=$(git branch --show-current)
+#       echo "$repo\t$branch" >> "$temp_file"
+#       cd ..
+#     fi
+#   done
+#
+#   # Display the results in columns
+#   column -t -s $'\t' "$temp_file"
+#
+#   # Clean up
+#   rm "$temp_file"
+# }
+
+tobin-code-list() {
+    local current_dir=$(pwd)
+
+    cd ~/code
+
+    for dir in */; do
+        echo "$dir"
+
+        cd "$dir"
+        # check if there is a .git directory
+        if [ -d ".git" ]; then
+            git branch | sed 's/^/  /'
+        else
+            echo "  No git repository"
+        fi
+        cd ..
+    done
+
+    cd "$current_dir"
 }
 
 # ----------------------------------------
@@ -124,6 +142,11 @@ if [ -f "$zsh_high_path" ]; then
     source "$zsh_high_path"
 else
     MISSING_TOOLS="$MISSING_TOOLS  zsh-syntax-highlighting \n"
+fi
+
+# Check if alt-tab not installed via brew
+if [ ! -d "/Applications/AltTab.app" ]; then
+    MISSING_TOOLS="$MISSING_TOOLS  alt-tab \n"
 fi
 
 if [ -n "$MISSING_TOOLS" ]; then
