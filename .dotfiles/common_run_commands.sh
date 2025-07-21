@@ -7,9 +7,12 @@ MISSING_TOOLS=""
 # Common aliases
 # ----------------------------------------
 
-alias ls="ls -a --color=auto"
-alias ll="ls -alD %Y-%m-%d"
-alias lw="ls -lD %Y-%d-%m --color=auto ~/monos"
+# alias ls="ls -a --color=auto"
+# alias ll="ls -alD %Y-%m-%d"
+# alias lw="ls -lD %Y-%d-%m --color=auto ~/monos"
+alias ls="eza"
+alias ll="eza -l --git-repos-no-status"
+# alias lr="eza -l --git-repos-no-status"
 # alias py="$(brew --prefix)/opt/python@3.10/bin/python3.10"
 
 # alias tobin-prune="git fetch --prune && git branch --v | grep '\[gone\]' | awk '{print \$1}' | xargs git branch -D"
@@ -148,6 +151,12 @@ fi
 if [ ! -d "/Applications/AltTab.app" ]; then
     MISSING_TOOLS="$MISSING_TOOLS  alt-tab \n"
 fi
+
+# Check if coreutils is installed via brew
+# Mostly just want it for timeout
+# if ! brew list --formula | grep -q coreutils; then
+#     MISSING_TOOLS="$MISSING_TOOLS  coreutils \n"
+# fi
 
 if [ -n "$MISSING_TOOLS" ]; then
     echo "\n🥵 Missing tools:"
