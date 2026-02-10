@@ -11,7 +11,7 @@ MISSING_TOOLS=""
 # alias ll="ls -alD %Y-%m-%d"
 # alias lw="ls -lD %Y-%d-%m --color=auto ~/monos"
 alias ls="eza"
-alias ll="eza -l --git-repos-no-status"
+alias ll="eza -laF --git-repos-no-status --group-directories-first"
 # alias lr="eza -l --git-repos-no-status"
 # alias py="$(brew --prefix)/opt/python@3.10/bin/python3.10"
 
@@ -98,6 +98,36 @@ tobin-code-list() {
     cd "$current_dir"
 }
 
+# Delete Python venvs & cache dirs under the given path (default: .)
+tobin-python-nuke() {
+  local root="${1:-.}"
+
+  local find_args=(
+    "$root" -type d
+    \( -name "venv" -o -name ".venv" -o -name "__pycache__" 
+       -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" \)
+    -not -path "*/node_modules/*"
+    -not -path "*/.venv/*"
+  )
+
+  echo "🔍 Searching for Python venvs & caches under: $root"
+  find "${find_args[@]}" -print
+
+  echo
+  printf "⚠️  Delete ALL of these directories? [y/N] "
+  read -r reply
+  case "$reply" in
+    [Yy]* )
+      echo "🧨 Deleting…"
+      find "${find_args[@]}" -exec rm -rf {} +
+      echo "✅ Done."
+      ;;
+    * )
+      echo "❎ Aborted."
+      ;;
+  esac
+}
+
 # ----------------------------------------
 # Prompt and color settings
 # ----------------------------------------
@@ -164,3 +194,42 @@ if [ -n "$MISSING_TOOLS" ]; then
     echo "✨ To install missing tools, run:"
     echo "  source ~/.dotfiles/install_tools.sh"
 fi
+
+
+# Terminal title management functions 
+# https://www.wiserfirst.com/blog/taking-control-of-terminal-titles/
+terminal_titles() {
+    case "$1" in
+        window)
+            echo -ne "\033]2;$2\007"
+            ;;
+        tab)
+            echo -ne "\033]1;$2\007"
+            ;;
+        both)
+            echo -ne "\033]0;$2\007"
+            ;;
+        help)
+            echo "Usage: terminal_titles [window|tab|both|reset|help] [title]"
+            echo "  window [title] - Set window title only"
+            echo "  tab [title]    - Set tab title only"
+            echo "  both [title]   - Set both window and tab to same title"
+            echo "  reset          - Reset to default titles"
+            echo "  help           - Show this help message"
+            echo "  (no args)      - Same as reset"
+            ;;
+        reset|"")
+            # Window title: full path with ~ for home
+            echo -ne "\033]2;${PWD/#$HOME/~}\007"
+            # Tab title: last portion of the full path
+            echo -ne "\033]1;${PWD##*/}\007"
+            ;;
+        *)
+            echo "Unknown command: $1"
+            echo "Use 'terminal_titles help' for usage"
+            ;;
+    esac
+}
+
+# Alias for convenience
+alias tt='terminal_titles'
