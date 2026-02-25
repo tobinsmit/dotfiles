@@ -7,6 +7,8 @@ MISSING_TOOLS=""
 # Common aliases
 # ----------------------------------------
 
+CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
+
 # alias ls="ls -a --color=auto"
 # alias ll="ls -alD %Y-%m-%d"
 # alias lw="ls -lD %Y-%d-%m --color=auto ~/monos"
@@ -103,11 +105,10 @@ tobin-python-nuke() {
   local root="${1:-.}"
 
   local find_args=(
-    "$root" -type d
-    \( -name "venv" -o -name ".venv" -o -name "__pycache__" 
+    "$root" -maxdepth "${2:-6}" -type d
+    \( -name "venv" -o -name ".venv" -o -name "__pycache__"
        -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" \)
-    -not -path "*/node_modules/*"
-    -not -path "*/.venv/*"
+    -prune
   )
 
   echo "🔍 Searching for Python venvs & caches under: $root"
@@ -118,8 +119,43 @@ tobin-python-nuke() {
   read -r reply
   case "$reply" in
     [Yy]* )
-      echo "🧨 Deleting…"
-      find "${find_args[@]}" -exec rm -rf {} +
+      if ! command -v trash &> /dev/null; then
+        echo "❌ 'trash' not found. Install with: brew install trash"
+        return 1
+      fi
+      echo "🧨 Trashing…"
+      find "${find_args[@]}" -exec sh -c 'trash "$1" && echo "  Trashed $1"' _ {} \;
+      echo "✅ Done."
+      ;;
+    * )
+      echo "❎ Aborted."
+      ;;
+  esac
+}
+
+# Delete node_modules dirs under the given path (default: .)
+tobin-node-nuke() {
+  local root="${1:-.}"
+
+  local find_args=(
+    "$root" -maxdepth "${2:-6}" -type d -name "node_modules"
+    -prune
+  )
+
+  echo "🔍 Searching for node_modules under: $root"
+  find "${find_args[@]}" -print
+
+  echo
+  printf "⚠️  Delete ALL of these directories? [y/N] "
+  read -r reply
+  case "$reply" in
+    [Yy]* )
+      if ! command -v trash &> /dev/null; then
+        echo "❌ 'trash' not found. Install with: brew install trash"
+        return 1
+      fi
+      echo "🧨 Trashing…"
+      find "${find_args[@]}" -exec sh -c 'trash "$1" && echo "  Trashed $1"' _ {} \;
       echo "✅ Done."
       ;;
     * )
@@ -232,4 +268,4 @@ terminal_titles() {
 }
 
 # Alias for convenience
-alias tt='terminal_titles'
+#alias tt='terminal_titles'
