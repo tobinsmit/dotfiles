@@ -1,0 +1,65 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        // Full line delete in terminals
+        "key": "cmd+backspace",
+        "command": "workbench.action.terminal.sendSequence",
+        "when": "terminalEditorFocus",
+        "args": {
+            "text": "\u0015"
+        }
+    },
+    {
+        // New Terminal
+        "key": "cmd+t",
+        "command": "workbench.action.createTerminalEditor",
+        // newWithCwd
+        // "command": "workbench.action.terminal.newWithCwd",
+        // "args": {
+        //     "cwd": "${workspaceFolderRoot}"
+        // },
+        // new
+        // "command": "workbench.action.terminal.new",
+        "when": "terminalProcessSupported",
+    },
+    {
+        // New Window
+        "key": "cmd+n",
+        "command": "workbench.action.newWindow"
+    },
+    {
+        // Mouse button next tab
+        "key": "ctrl+tab",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        // Mouse button previous tab
+        "key": "ctrl+shift+tab",
+        "command": "workbench.action.previousEditor"
+    },
+    {
+        // Disable Cursor AI chat
+        "key": "shift+cmd+l",
+        "command": "-aichat.insertselectionintochat"
+    },
+    {
+        // Disable Cursor composer chat
+        "key": "shift+cmd+l",
+        "command": "-composer.newAgentChat"
+    },
+    {
+        // Navigate Forward
+        "key": "ctrl+=",
+        "command": "workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        // Newline for Claude Code
+        "key": "shift+enter",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\u001b\r"
+        },
+        "when": "terminalFocus"
+    },
+]
