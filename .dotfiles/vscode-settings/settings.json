@@ -1,0 +1,168 @@
+{
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "claudeCode.preferredLocation": "panel",
+    "cursor.composer.shouldAllowCustomModes": true,
+    "cursor.cpp.disabledLanguages": [
+        "plaintext"
+    ],
+    "cursor.cpp.enablePartialAccepts": true,
+    "cursor.general.disableHttp2": true,
+    "cursor.windowSwitcher.sidebarHoverCollapsed": true,
+    "cSpell.userWords": [
+        "akytec",
+        "Alicat",
+        "Andromedia",
+        "antifoam",
+        "autodrain",
+        "autojacket",
+        "Behaviours",
+        "blowdown",
+        "childstep",
+        "coeffs",
+        "deadband",
+        "Dencytee",
+        "depressurise",
+        "FTDI",
+        "Gemu's",
+        "iolink",
+        "IOLM",
+        "marlow",
+        "mcip",
+        "microsparger",
+        "midlevel",
+        "milli",
+        "Modbus",
+        "MSIP",
+        "negele",
+        "ntrol",
+        "Pressurisation",
+        "Pressurise",
+        "prioritised",
+        "Runmode",
+        "setpoint",
+        "Setpoints",
+        "spargers",
+        "sprayball",
+        "stabilisation",
+        "Sterilisation",
+        "TSHX",
+        "UART",
+        "underpressure",
+        "Underpressure",
+        "unticked",
+        "Visiferm"
+    ],
+    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.renderSideBySide": true,
+    "editor.inlayHints.enabled": "off",
+    "editor.minimap.enabled": true,
+    "editor.minimap.sectionHeaderLetterSpacing": 0,
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.side": "left",
+    "editor.minimap.size": "fit",
+    "editor.renderWhitespace": "all",
+    "editor.smoothScrolling": true,
+    "editor.stickyScroll.defaultModel": "foldingProviderModel",
+    "editor.stickyScroll.maxLineCount": 20,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "errorLens.enabled": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.sortOrder": "type",
+    "files.dialog.defaultPath": "/Users/tobin.smit/code",
+    "git.autofetch": true,
+    "git.blame.editorDecoration.enabled": true,
+    "git.confirmSync": false,
+    "git.openRepositoryInParentFolders": "always",
+    "git.suggestSmartCommit": false,
+    "git.useEditorAsCommitInput": false,
+    "githubPullRequests.pullBranch": "never",
+    "gitlens.plusFeatures.enabled": false,
+    "gitlens.showWhatsNewAfterUpgrades": false,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "makefile.configureOnOpen": true,
+    "npm.keybindingsChangedWarningShown": true,
+    "python.createEnvironment.trigger": "off",
+    "search.collapseResults": "alwaysCollapse",
+    "security.promptForLocalFileProtocolHandling": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "sonarlint.automaticAnalysis": true,
+    "sonarlint.connectedMode.connections.sonarcloud": [
+        {
+            "connectionId": "vow-eng",
+            "disableNotifications": true,
+            "organizationKey": "vow-eng",
+            "region": "EU"
+        }
+    ],
+    "sonarlint.focusOnNewCode": false,
+    "terminal.external.osxExec": "iTerm.app",
+    "terminal.integrated.allowChords": false,
+    "terminal.integrated.commandsToSkipShell": [
+        "workbench.action.nextEditor",
+        "workbench.action.previousEditor"
+    ],
+    "terminal.integrated.cwd": "${workspaceFolder:📁 mono (root)}",
+    // "terminal.integrated.defaultLocation": "editor",
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.inheritEnv": false,
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.stickyScroll.enabled": true,
+    "terminal.integrated.tabs.title": "${sequence}",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "update.releaseTrack": "prerelease",
+    "vsicons.dontShowNewVersionMessage": true,
+    "window.title": "${rootPath}",
+    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.svg": "imagePreview.previewEditor"
+    },
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.list.smoothScrolling": true,
+    "workbench.browser.openLocalhostLinks": true,
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+    "basedpyright.analysis.inlayHints.genericTypes": false,
+    "basedpyright.analysis.inlayHints.callArgumentNames": false,
+    "basedpyright.analysis.inlayHints.callArgumentNamesMatching": true,
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "githubPullRequests.createOnPublishBranch": "never",
+    "githubPullRequests.queries": [
+        {
+            "label": "Copilot on My Behalf",
+            "query": "repo:${owner}/${repository} is:open author:copilot assignee:${user}"
+        },
+        {
+            "label": "Local Pull Request Branches",
+            "query": "default"
+        },
+        {
+            "label": "Waiting For My Review",
+            "query": "repo:${owner}/${repository} is:open review-requested:${user}"
+        },
+        {
+            "label": "Created By Me",
+            "query": "repo:${owner}/${repository} is:open author:${user}"
+        },
+        {
+            "label": "All Open",
+            "query": "default"
+        }
+    ],
+    "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
+    "docker.extension.enableComposeLanguageServer": false,
+    "terminal.integrated.scrollback": 5000,
+    "workbench.startupEditor": "welcomePageInEmptyWorkbench",
+}
