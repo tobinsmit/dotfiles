@@ -7,7 +7,7 @@ MISSING_TOOLS=""
 # Common aliases
 # ----------------------------------------
 
-CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
+unset CLAUDE_CODE_DISABLE_AUTO_MEMORY
 
 # alias ls="ls -a --color=auto"
 # alias ll="ls -alD %Y-%m-%d"
@@ -25,7 +25,7 @@ tobin-prune() {
     git fetch --prune
 
     # List branches that can be deleted
-    branches=$(git branch --v | grep '\[gone\]' | awk '{print $1}')
+    branches=$(git branch --v | grep '\[gone\]' | awk '{print ($1 == "*") ? $2 : $1}')
 
     # If no branches can be deleted, exit
     if [ -z "$branches" ]; then
@@ -33,14 +33,30 @@ tobin-prune() {
         return
     fi
 
+    # Check if current branch is in the delete list
+    current_branch=$(git branch --show-current)
+    on_deletable=false
+    if echo "$branches" | grep -qx "$current_branch"; then
+        on_deletable=true
+    fi
+
     # Ask user to continue
     echo "The following branches can be deleted:"
     echo "$branches" | sed 's/^/  /'
-    echo -n "Are you sure you want to delete these branches? (Y/n): "
+    if [ "$on_deletable" = true ]; then
+        echo -n "This will switch to master and delete these branches. Continue? (Y/n): "
+    else
+        echo -n "Are you sure you want to delete these branches? (Y/n): "
+    fi
     read confirm
     if [ "$confirm" != "Y" ] && [ "$confirm" != "" ]; then
         echo "Aborting."
         return
+    fi
+
+    # Switch to master if needed
+    if [ "$on_deletable" = true ]; then
+        git checkout master || { echo "Failed to switch to master. Aborting."; return 1; }
     fi
 
     # Delete the branches
@@ -232,7 +248,7 @@ if [ -n "$MISSING_TOOLS" ]; then
 fi
 
 
-# Terminal title management functions 
+# Terminal title management functions
 # https://www.wiserfirst.com/blog/taking-control-of-terminal-titles/
 terminal_titles() {
     case "$1" in
