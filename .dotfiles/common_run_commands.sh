@@ -20,9 +20,25 @@ alias ll="eza -laF --git-repos-no-status --group-directories-first"
 # alias tobin-prune="git fetch --prune && git branch --v | grep '\[gone\]' | awk '{print \$1}' | xargs git branch -D"
 
 tobin-prune() {
+    # Parse flags
+    local dry_run=false force=false verbose=false
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) dry_run=true ;;
+            --force) force=true ;;
+            --verbose|-v) verbose=true ;;
+        esac
+    done
+
     # Prune all branches that have been deleted on the remote
-    echo "Fetching remote branches..."
-    git fetch --prune
+    echo -n "Fetching..."
+    if [ "$verbose" = true ]; then
+        echo ""
+        git fetch --prune
+    else
+        git fetch --prune --quiet 2>/dev/null
+        echo -ne "\r\033[K"
+    fi
 
     # List branches that can be deleted
     branches=$(git branch --v | grep '\[gone\]' | awk '{print ($1 == "*") ? $2 : $1}')
@@ -40,27 +56,99 @@ tobin-prune() {
         on_deletable=true
     fi
 
-    # Ask user to continue
+    # Show branches, mimicking git branch format
     echo "The following branches can be deleted:"
-    echo "$branches" | sed 's/^/  /'
-    if [ "$on_deletable" = true ]; then
-        echo -n "This will switch to master and delete these branches. Continue? (Y/n): "
-    else
-        echo -n "Are you sure you want to delete these branches? (Y/n): "
-    fi
-    read confirm
-    if [ "$confirm" != "Y" ] && [ "$confirm" != "" ]; then
-        echo "Aborting."
+    while IFS= read -r branch; do
+        if [ "$branch" = "$current_branch" ]; then
+            echo "* $branch"
+        else
+            echo "  $branch"
+        fi
+    done <<< "$branches"
+
+    # Dry run: just show, don't delete
+    if [ "$dry_run" = true ]; then
         return
+    fi
+
+    # Prompt unless --force
+    if [ "$force" != true ]; then
+        if [ "$on_deletable" = true ]; then
+            echo -n "This will switch to master and delete these branches. Continue? (Y/n): "
+        else
+            echo -n "Are you sure you want to delete these branches? (Y/n): "
+        fi
+        read confirm
+        if [ "$confirm" != "Y" ] && [ "$confirm" != "" ]; then
+            echo "Aborting."
+            return
+        fi
     fi
 
     # Switch to master if needed
     if [ "$on_deletable" = true ]; then
-        git checkout master || { echo "Failed to switch to master. Aborting."; return 1; }
+        git checkout master --quiet || { echo "Failed to switch to master. Aborting."; return 1; }
+        if git status -uno | grep -q "Your branch is behind"; then
+            echo -n "master is behind remote. Pull? (Y/n): "
+            read pull_confirm
+            if [ "$pull_confirm" = "Y" ] || [ "$pull_confirm" = "" ]; then
+                git pull --quiet 2>/dev/null
+                echo "Pulled."
+            fi
+        fi
     fi
 
     # Delete the branches
     echo "$branches" | xargs git branch -D
+}
+
+tobin-prune-all() {
+    local flag=""
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run|--force) flag="$arg" ;;
+            *) ;;
+        esac
+    done
+
+    local original_dir=$(pwd)
+
+    # Get current remote master hash with a single network call
+    local any_repo=$(find ~/code -maxdepth 2 -name .git -type d -print -quit)
+    local remote_hash=""
+    if [ -n "$any_repo" ]; then
+        remote_hash=$(git -C "${any_repo%/.git}" ls-remote --quiet origin master 2>/dev/null | awk '{print $1}')
+    fi
+
+    local skipped=0
+
+    for dir in ~/code/*/; do
+        [ -d "$dir.git" ] || continue
+        local name=$(basename "$dir")
+
+        # Skip repos whose origin/master already matches remote
+        if [ -n "$remote_hash" ]; then
+            local local_hash=$(git -C "$dir" rev-parse origin/master 2>/dev/null)
+            if [ "$local_hash" = "$remote_hash" ]; then
+                # Still check for existing [gone] branches without fetching
+                local gone=$(git -C "$dir" branch -vv 2>/dev/null | grep '\[.*: gone\]')
+                if [ -z "$gone" ]; then
+                    echo "\n--- $name --- (up to date)"
+                    skipped=$((skipped + 1))
+                    continue
+                fi
+            fi
+        fi
+
+        echo "\n--- $name ---"
+        cd "$dir"
+        tobin-prune $flag
+        cd "$original_dir"
+    done
+
+    if [ "$skipped" -gt 0 ]; then
+        echo "\nSkipped $skipped repos (already up to date)"
+    fi
 }
 
 # # Function to list git repositories and their current branches
@@ -96,24 +184,43 @@ tobin-prune() {
 # }
 
 tobin-code-list() {
-    local current_dir=$(pwd)
+    local BOLD=$'\033[1m' GREEN=$'\033[0;32m' YELLOW=$'\033[0;33m' NC=$'\033[0m'
+    local clean=0 feature=0
 
-    cd ~/code
+    for dir in ~/code/*/; do
+        [ -d "$dir.git" ] || continue
+        local name=$(basename "$dir")
+        local current=$(git -C "$dir" branch --show-current 2>/dev/null)
 
-    for dir in */; do
-        echo "$dir"
+        # Build branch list with current branch coloured
+        local branch_list=""
+        while IFS= read -r line; do
+            local is_current=false
+            local branch=$(echo "$line" | sed 's/^[* ] //')
+            [[ "$line" == \** ]] && is_current=true
 
-        cd "$dir"
-        # check if there is a .git directory
-        if [ -d ".git" ]; then
-            git branch | sed 's/^/  /'
+            if $is_current; then
+                if [[ "$branch" == "master" ]]; then
+                    branch_list+="${BOLD}${GREEN}${branch}${NC} "
+                else
+                    branch_list+="${BOLD}${YELLOW}${branch}${NC} "
+                fi
+            else
+                branch_list+="$branch "
+            fi
+        done < <(git -C "$dir" branch 2>/dev/null)
+
+        echo "${BOLD}${name}${NC}  $branch_list"
+
+        if [[ "$current" == "master" ]]; then
+            clean=$((clean + 1))
         else
-            echo "  No git repository"
+            feature=$((feature + 1))
         fi
-        cd ..
     done
 
-    cd "$current_dir"
+    echo ""
+    echo "$clean on master, $feature on feature branches"
 }
 
 # Delete Python venvs & cache dirs under the given path (default: .)
