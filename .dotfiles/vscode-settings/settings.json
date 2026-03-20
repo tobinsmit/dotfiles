@@ -3,7 +3,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[python]": {
-        "diffEditor.ignoreTrimWhitespace": false,
+        "diffEditor.ignoreTrimWhitespace": true,
         "editor.insertSpaces": true,
         "editor.tabSize": 4
     },
@@ -21,10 +21,12 @@
     "cSpell.userWords": [
         "akytec",
         "Alicat",
+        "analyse",
         "Andromedia",
         "antifoam",
         "autodrain",
         "autojacket",
+        "behaviour",
         "Behaviours",
         "blowdown",
         "childstep",
@@ -32,6 +34,7 @@
         "deadband",
         "Dencytee",
         "depressurise",
+        "Exchangify",
         "FTDI",
         "Gemu's",
         "iolink",
@@ -41,6 +44,7 @@
         "microsparger",
         "midlevel",
         "milli",
+        "minimise",
         "Modbus",
         "MSIP",
         "negele",
@@ -49,12 +53,14 @@
         "Pressurise",
         "prioritised",
         "Runmode",
+        "Sanitiser",
         "setpoint",
         "Setpoints",
         "spargers",
         "sprayball",
         "stabilisation",
         "Sterilisation",
+        "tmpl",
         "TSHX",
         "UART",
         "underpressure",
@@ -62,6 +68,7 @@
         "unticked",
         "Visiferm"
     ],
+    "window.openFoldersInNewWindow": "on",
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": true,
     "editor.inlayHints.enabled": "off",
@@ -137,7 +144,6 @@
     "basedpyright.analysis.inlayHints.genericTypes": false,
     "basedpyright.analysis.inlayHints.callArgumentNames": false,
     "basedpyright.analysis.inlayHints.callArgumentNamesMatching": true,
-    "diffEditor.hideUnchangedRegions.enabled": true,
     "githubPullRequests.createOnPublishBranch": "never",
     "githubPullRequests.queries": [
         {
@@ -164,5 +170,11 @@
     "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
     "docker.extension.enableComposeLanguageServer": false,
     "terminal.integrated.scrollback": 5000,
-    "workbench.startupEditor": "welcomePageInEmptyWorkbench",
+    "workbench.startupEditor": "none",
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "terminal.integrated.persistentSessionReviveProcess": "never",
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "terminal.integrated.tabs.description": "",
 }

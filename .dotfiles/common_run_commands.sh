@@ -88,14 +88,7 @@ tobin-prune() {
     # Switch to master if needed
     if [ "$on_deletable" = true ]; then
         git checkout master --quiet || { echo "Failed to switch to master. Aborting."; return 1; }
-        if git status -uno | grep -q "Your branch is behind"; then
-            echo -n "master is behind remote. Pull? (Y/n): "
-            read pull_confirm
-            if [ "$pull_confirm" = "Y" ] || [ "$pull_confirm" = "" ]; then
-                git pull --quiet 2>/dev/null
-                echo "Pulled."
-            fi
-        fi
+        git pull --quiet 2>/dev/null
     fi
 
     # Delete the branches
