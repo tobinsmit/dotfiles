@@ -52,5 +52,17 @@ else
     echo "✅ AltTab already installed"
 fi
 
+# ----------------------------------------
+# 1password-cli
+# ----------------------------------------
+
+if ! which op >/dev/null 2>&1; then
+    echo "Installing 1password-cli..."
+    brew install 1password-cli
+    echo "✅ 1password-cli installed"
+else
+    echo "✅ 1password-cli already installed"
+fi
+
 echo ""
 echo "✨ All tools installed! Open a new terminal to apply changes."
