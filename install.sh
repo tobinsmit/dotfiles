@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# This script clones and sets up github.com/tobinsmit/dotfiles into $HOME
+# This script clones and sets up github.com/tobinsmit/dotfiles into $HOME/.dotfiles
 
 # It will:
 # - backup your existing dotfiles
 # - clone the repository to $HOME/.dotfiles
-# - set up the 'dotfiles' alias for management
+# - set up common run commands
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # shellcheck disable=SC2312
@@ -161,12 +161,7 @@ clone_repo() {
     fi
   fi
   
-  dotfiles() {
-    git --git-dir="$DOTFILES_DIR/.git" --work-tree="$HOME" "$@"
-  }
-  git clone --bare "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR/.git"
-  dotfiles config --local status.showUntrackedFiles no
-  dotfiles checkout
+  git clone "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR"
   echo "✅ Cloned and configured"
 }
 
@@ -226,11 +221,12 @@ main() {
   ohai "What's next:"
   echo "1. Source your shell configuration: "
   echo "   source $SHELL_CONFIG"
-  echo "2. Use 'dotfiles' command to manage your dotfiles:"
-  echo "   - dotfiles status"
-  echo "   - dotfiles add ~/.some_config"
-  echo "   - dotfiles commit -m \"Add some config\""
-  echo "   - dotfiles push"
+  echo "2. Manage your dotfiles with regular git:"
+  echo "   cd ~/.dotfiles"
+  echo "   git status"
+  echo "   git add some_file"
+  echo "   git commit -m \"Add some config\""
+  echo "   git push"
 }
 
 main
