@@ -334,6 +334,11 @@ if [ ! -d "/Applications/AltTab.app" ]; then
     MISSING_TOOLS="$MISSING_TOOLS  alt-tab \n"
 fi
 
+# Check if 1password-cli is installed
+if ! which op >/dev/null 2>&1; then
+    MISSING_TOOLS="$MISSING_TOOLS  1password-cli \n"
+fi
+
 # Check if coreutils is installed via brew
 # Mostly just want it for timeout
 # if ! brew list --formula | grep -q coreutils; then
