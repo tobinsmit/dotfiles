@@ -3,21 +3,21 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[python]": {
-        "diffEditor.ignoreTrimWhitespace": true,
+        "diffEditor.ignoreTrimWhitespace": false,
         "editor.insertSpaces": true,
         "editor.tabSize": 4
     },
     "[typescriptreact]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
+    "basedpyright.analysis.inlayHints.callArgumentNames": false,
+    "basedpyright.analysis.inlayHints.callArgumentNamesMatching": true,
+    "basedpyright.analysis.inlayHints.genericTypes": false,
     "claudeCode.preferredLocation": "panel",
-    "cursor.composer.shouldAllowCustomModes": true,
-    "cursor.cpp.disabledLanguages": [
-        "plaintext"
-    ],
-    "cursor.cpp.enablePartialAccepts": true,
-    "cursor.general.disableHttp2": true,
-    "cursor.windowSwitcher.sidebarHoverCollapsed": true,
     "cSpell.userWords": [
         "akytec",
         "Alicat",
@@ -68,11 +68,19 @@
         "unticked",
         "Visiferm"
     ],
-    "window.openFoldersInNewWindow": "on",
+    "cursor.composer.shouldAllowCustomModes": true,
+    "cursor.cpp.disabledLanguages": [
+        "plaintext"
+    ],
+    "cursor.cpp.enablePartialAccepts": true,
+    "cursor.general.disableHttp2": true,
+    "cursor.windowSwitcher.sidebarHoverCollapsed": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": true,
+    "docker.extension.enableComposeLanguageServer": false,
     "editor.inlayHints.enabled": "off",
     "editor.minimap.enabled": true,
+    "editor.minimap.renderCharacters": false,
     "editor.minimap.sectionHeaderLetterSpacing": 0,
     "editor.minimap.showSlider": "always",
     "editor.minimap.side": "left",
@@ -94,57 +102,8 @@
     "git.openRepositoryInParentFolders": "always",
     "git.suggestSmartCommit": false,
     "git.useEditorAsCommitInput": false,
-    "githubPullRequests.pullBranch": "never",
-    "gitlens.plusFeatures.enabled": false,
-    "gitlens.showWhatsNewAfterUpgrades": false,
-    "javascript.updateImportsOnFileMove.enabled": "always",
-    "makefile.configureOnOpen": true,
-    "npm.keybindingsChangedWarningShown": true,
-    "python.createEnvironment.trigger": "off",
-    "search.collapseResults": "alwaysCollapse",
-    "security.promptForLocalFileProtocolHandling": false,
-    "security.workspace.trust.untrustedFiles": "open",
-    "sonarlint.automaticAnalysis": true,
-    "sonarlint.connectedMode.connections.sonarcloud": [
-        {
-            "connectionId": "vow-eng",
-            "disableNotifications": true,
-            "organizationKey": "vow-eng",
-            "region": "EU"
-        }
-    ],
-    "sonarlint.focusOnNewCode": false,
-    "terminal.external.osxExec": "iTerm.app",
-    "terminal.integrated.allowChords": false,
-    "terminal.integrated.commandsToSkipShell": [
-        "workbench.action.nextEditor",
-        "workbench.action.previousEditor"
-    ],
-    "terminal.integrated.cwd": "${workspaceFolder:📁 mono (root)}",
-    // "terminal.integrated.defaultLocation": "editor",
-    "terminal.integrated.enableMultiLinePasteWarning": "never",
-    "terminal.integrated.enablePersistentSessions": false,
-    "terminal.integrated.inheritEnv": false,
-    "terminal.integrated.smoothScrolling": true,
-    "terminal.integrated.stickyScroll.enabled": true,
-    "terminal.integrated.tabs.title": "${sequence}",
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "update.releaseTrack": "prerelease",
-    "vsicons.dontShowNewVersionMessage": true,
-    "window.title": "${rootPath}",
-    "workbench.colorTheme": "Default Dark Modern",
-    "workbench.editorAssociations": {
-        "*.copilotmd": "vscode.markdown.preview.editor",
-        "*.svg": "imagePreview.previewEditor"
-    },
-    "workbench.iconTheme": "vscode-icons",
-    "workbench.list.smoothScrolling": true,
-    "workbench.browser.openLocalhostLinks": true,
-    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
-    "basedpyright.analysis.inlayHints.genericTypes": false,
-    "basedpyright.analysis.inlayHints.callArgumentNames": false,
-    "basedpyright.analysis.inlayHints.callArgumentNamesMatching": true,
     "githubPullRequests.createOnPublishBranch": "never",
+    "githubPullRequests.pullBranch": "never",
     "githubPullRequests.queries": [
         {
             "label": "Copilot on My Behalf",
@@ -167,14 +126,66 @@
             "query": "default"
         }
     ],
-    "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
-    "docker.extension.enableComposeLanguageServer": false,
-    "terminal.integrated.scrollback": 5000,
-    "workbench.startupEditor": "none",
-    "[yaml]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
+    "gitlens.plusFeatures.enabled": false,
+    "gitlens.showWhatsNewAfterUpgrades": false,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "makefile.configureOnOpen": true,
+    "npm.keybindingsChangedWarningShown": true,
+    "python.createEnvironment.trigger": "off",
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+    "search.collapseResults": "alwaysCollapse",
+    "security.promptForLocalFileProtocolHandling": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "sonarlint.automaticAnalysis": true,
+    "sonarlint.connectedMode.connections.sonarcloud": [
+        {
+            "connectionId": "vow-eng",
+            "disableNotifications": true,
+            "organizationKey": "vow-eng",
+            "region": "EU"
+        }
+    ],
+    "sonarlint.focusOnNewCode": false,
+    "terminal.external.osxExec": "iTerm.app",
+    "terminal.integrated.allowChords": true,
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "terminal.integrated.commandsToSkipShell": [
+        "workbench.action.nextEditor",
+        "workbench.action.previousEditor",
+        "workbench.action.createTerminalEditor",
+        "workbench.action.newWindow",
+        "workbench.action.openRecent",
+    ],
+    "terminal.integrated.cwd": "${workspaceFolder:📁 mono (root)}",
+    // "terminal.integrated.defaultLocation": "editor",
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.inheritEnv": false,
     "terminal.integrated.persistentSessionReviveProcess": "never",
-    "diffEditor.hideUnchangedRegions.enabled": true,
+    "terminal.integrated.scrollback": 5000,
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.stickyScroll.enabled": true,
     "terminal.integrated.tabs.description": "",
+    "terminal.integrated.tabs.title": "${sequence}",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "update.releaseTrack": "dev",
+    "vsicons.dontShowNewVersionMessage": true,
+    "window.openFoldersInNewWindow": "on",
+    "window.title": "${rootPath}",
+    "workbench.browser.openLocalhostLinks": true,
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.svg": "imagePreview.previewEditor"
+    },
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.list.smoothScrolling": true,
+    "workbench.startupEditor": "none",
+    "workbench.activityBar.orientation": "vertical",
+    "workbench.colorTheme": "Dark Modern",
+    "update.mode": "silentlyApplyOnQuit",
+    "workbench.editor.autoLockGroups": {
+        "terminalEditor": false,
+        "mainThreadWebview-simpleBrowser.view": false,
+        "mainThreadWebview-browserPreview": false
+    }
 }
