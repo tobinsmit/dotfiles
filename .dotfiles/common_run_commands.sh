@@ -294,11 +294,11 @@ if [ -f "$HOME/.git-prompt.sh" ]; then
         __git_ps1 '%s ' | sed 's/.*\///'
     }
 
-    setopt PROMPT_SUBST ; PS1='%F{green}ts %B%F{cyan}%~ %b%F{yellow}$(git_prompt)%B%F{141}%# %f%b'
+    setopt PROMPT_SUBST ; PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %b%F{yellow}$(git_prompt)%B%F{141}%# %f%b'
 else
     # Fallback to old prompt if git-prompt.sh is not available
     MISSING_TOOLS="$MISSING_TOOLS  .git-prompt.sh \n"
-    PS1='%F{green}ts %B%F{cyan}%~ %F{141}%# %f%b'
+    PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %F{141}%# %f%b'
 fi
 
 # ----------------------------------------
