@@ -222,16 +222,24 @@ tobin-code-list() {
 # Delete Python venvs & cache dirs under the given path (default: .)
 tobin-python-nuke() {
   local root="${1:-.}"
+  local maxdepth="${2:-10}"
+  local matches
+  local had_errors=0
 
-  local find_args=(
-    "$root" -maxdepth "${2:-6}" -type d
-    \( -name "venv" -o -name ".venv" -o -name "__pycache__"
-       -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" \)
-    -prune
-  )
+  matches="$(
+    find "$root" -maxdepth "$maxdepth" -type d \
+      \( -name "venv" -o -name ".venv" -o -name "__pycache__" \
+         -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" \) \
+      -prune -print
+  )"
 
   echo "🔍 Searching for Python venvs & caches under: $root"
-  find "${find_args[@]}" -print
+  printf '%s\n' "$matches"
+
+  if [ -z "$matches" ]; then
+    echo "✅ No Python venvs or caches found."
+    return 0
+  fi
 
   echo
   printf "⚠️  Delete ALL of these directories? [y/N] "
@@ -243,8 +251,21 @@ tobin-python-nuke() {
         return 1
       fi
       echo "🧨 Trashing…"
-      find "${find_args[@]}" -exec sh -c 'trash "$1" && echo "  Trashed $1"' _ {} \;
-      echo "✅ Done."
+      while IFS= read -r target; do
+        [ -n "$target" ] || continue
+        if trash "$target"; then
+          echo "  Trashed $target"
+        else
+          echo "  Failed to trash $target"
+          had_errors=1
+        fi
+      done <<< "$matches"
+      if [ "$had_errors" -eq 0 ]; then
+        echo "✅ Done."
+      else
+        echo "❌ Finished with errors."
+        return 1
+      fi
       ;;
     * )
       echo "❎ Aborted."
@@ -255,14 +276,21 @@ tobin-python-nuke() {
 # Delete node_modules dirs under the given path (default: .)
 tobin-node-nuke() {
   local root="${1:-.}"
+  local maxdepth="${2:-10}"
+  local matches
+  local had_errors=0
 
-  local find_args=(
-    "$root" -maxdepth "${2:-6}" -type d -name "node_modules"
-    -prune
-  )
+  matches="$(
+    find "$root" -maxdepth "$maxdepth" -type d -name "node_modules" -prune -print
+  )"
 
   echo "🔍 Searching for node_modules under: $root"
-  find "${find_args[@]}" -print
+  printf '%s\n' "$matches"
+
+  if [ -z "$matches" ]; then
+    echo "✅ No node_modules directories found."
+    return 0
+  fi
 
   echo
   printf "⚠️  Delete ALL of these directories? [y/N] "
@@ -274,13 +302,159 @@ tobin-node-nuke() {
         return 1
       fi
       echo "🧨 Trashing…"
-      find "${find_args[@]}" -exec sh -c 'trash "$1" && echo "  Trashed $1"' _ {} \;
-      echo "✅ Done."
+      while IFS= read -r target; do
+        [ -n "$target" ] || continue
+        if trash "$target"; then
+          echo "  Trashed $target"
+        else
+          echo "  Failed to trash $target"
+          had_errors=1
+        fi
+      done <<< "$matches"
+      if [ "$had_errors" -eq 0 ]; then
+        echo "✅ Done."
+      else
+        echo "❌ Finished with errors."
+        return 1
+      fi
       ;;
     * )
       echo "❎ Aborted."
       ;;
   esac
+}
+
+# Delete gitignored files under the given path (default: .)
+tobin-gitignored-nuke() {
+  local root="${1:-.}"
+  local had_errors=0
+  local original_dir="$PWD"
+
+  if ! command -v git &> /dev/null; then
+    echo "❌ 'git' not found."
+    return 1
+  fi
+
+  if ! [ -d "$root" ]; then
+    echo "❌ Directory not found: $root"
+    return 1
+  fi
+
+  if ! (
+    cd "$root" 2>/dev/null || exit 1
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1
+  ); then
+    echo "❎ Skipping gitignored cleanup: $root is not inside a git work tree."
+    return 0
+  fi
+
+  echo "🔍 Searching for gitignored files under: $root"
+  local ignored_files
+  ignored_files="$(
+    cd "$root" &&
+    git ls-files --others -i --exclude-standard
+  )"
+  printf '%s\n' "$ignored_files"
+
+  if [ -z "$ignored_files" ]; then
+    echo "✅ No gitignored files found."
+    return 0
+  fi
+
+  echo
+  printf "⚠️  Delete ALL of these files? [y/N] "
+  read -r reply
+  case "$reply" in
+    [Yy]* )
+      if ! command -v trash &> /dev/null; then
+        echo "❌ 'trash' not found. Install with: brew install trash"
+        return 1
+      fi
+      echo "🧨 Trashing…"
+      cd "$root" || return 1
+      while IFS= read -r target; do
+        [ -n "$target" ] || continue
+        if trash "$target"; then
+          echo "  Trashed $target"
+        else
+          echo "  Failed to trash $target"
+          had_errors=1
+        fi
+      done <<< "$ignored_files"
+      cd "$original_dir" || return 1
+      if [ "$had_errors" -eq 0 ]; then
+        echo "✅ Done."
+      else
+        echo "❌ Finished with errors."
+        return 1
+      fi
+      ;;
+    * )
+      echo "❎ Aborted."
+      ;;
+  esac
+}
+
+# Delete empty directories under the given path (default: .)
+tobin-empty-dir-nuke() {
+  local root="${1:-.}"
+  local matches
+  local had_errors=0
+
+  matches="$(find "$root" -depth -type d -empty -print)"
+
+  echo "🔍 Searching for empty directories under: $root"
+  printf '%s\n' "$matches"
+
+  if [ -z "$matches" ]; then
+    echo "✅ No empty directories found."
+    return 0
+  fi
+
+  echo
+  printf "⚠️  Delete ALL of these directories? [y/N] "
+  read -r reply
+  case "$reply" in
+    [Yy]* )
+      if ! command -v trash &> /dev/null; then
+        echo "❌ 'trash' not found. Install with: brew install trash"
+        return 1
+      fi
+      echo "🧨 Trashing…"
+      while IFS= read -r target; do
+        [ -n "$target" ] || continue
+        if trash "$target"; then
+          echo "  Trashed $target"
+        else
+          echo "  Failed to trash $target"
+          had_errors=1
+        fi
+      done <<< "$matches"
+      if [ "$had_errors" -eq 0 ]; then
+        echo "✅ Done."
+      else
+        echo "❌ Finished with errors."
+        return 1
+      fi
+      ;;
+    * )
+      echo "❎ Aborted."
+      ;;
+  esac
+}
+
+# Run Python, Node, gitignored, and empty-dir cleanup under the given path (default: .)
+tobin-nuke() {
+  local root="${1:-.}"
+  local maxdepth="${2:-10}"
+
+  tobin-python-nuke "$root" "$maxdepth" || return $?
+  echo
+  tobin-node-nuke "$root" "$maxdepth" || return $?
+  echo
+  tobin-gitignored-nuke "$root" || return $?
+  echo
+  tobin-empty-dir-nuke "$root" || return $?
 }
 
 # ----------------------------------------
