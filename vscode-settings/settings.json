@@ -11,8 +11,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[yaml]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "diffEditor.ignoreTrimWhitespace": true
+        "diffEditor.ignoreTrimWhitespace": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
     "basedpyright.analysis.inlayHints.callArgumentNames": false,
@@ -76,6 +76,8 @@
     "cursor.cpp.enablePartialAccepts": true,
     "cursor.general.disableHttp2": true,
     "cursor.windowSwitcher.sidebarHoverCollapsed": true,
+    "cursorpyright.shouldImportPylanceSettings": "never",
+    "diffEditor.hideUnchangedRegions.enabled": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": true,
     "docker.extension.enableComposeLanguageServer": false,
@@ -149,7 +151,6 @@
     "sonarlint.focusOnNewCode": false,
     "terminal.external.osxExec": "iTerm.app",
     "terminal.integrated.allowChords": true,
-    "terminal.integrated.sendKeybindingsToShell": true,
     "terminal.integrated.commandsToSkipShell": [
         "workbench.action.nextEditor",
         "workbench.action.previousEditor",
@@ -164,31 +165,30 @@
     "terminal.integrated.inheritEnv": false,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.scrollback": 5000,
+    "terminal.integrated.sendKeybindingsToShell": true,
     "terminal.integrated.smoothScrolling": true,
     "terminal.integrated.stickyScroll.enabled": true,
     "terminal.integrated.tabs.description": "",
     "terminal.integrated.tabs.title": "${sequence}",
     "typescript.updateImportsOnFileMove.enabled": "always",
+    "update.mode": "silentlyApplyOnQuit",
     "update.releaseTrack": "dev",
     "vsicons.dontShowNewVersionMessage": true,
     "window.openFoldersInNewWindow": "on",
     "window.title": "${rootPath}",
+    "workbench.activityBar.orientation": "vertical",
     "workbench.browser.openLocalhostLinks": true,
+    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.editor.autoLockGroups": {
+        "mainThreadWebview-browserPreview": false,
+        "mainThreadWebview-simpleBrowser.view": false,
+        "terminalEditor": false
+    },
     "workbench.editorAssociations": {
         "*.copilotmd": "vscode.markdown.preview.editor",
         "*.svg": "imagePreview.previewEditor"
     },
     "workbench.iconTheme": "vscode-icons",
     "workbench.list.smoothScrolling": true,
-    "workbench.startupEditor": "none",
-    "workbench.activityBar.orientation": "vertical",
-    "update.mode": "silentlyApplyOnQuit",
-    "workbench.editor.autoLockGroups": {
-        "terminalEditor": false,
-        "mainThreadWebview-simpleBrowser.view": false,
-        "mainThreadWebview-browserPreview": false
-    },
-    "diffEditor.hideUnchangedRegions.enabled": true,
-    "cursorpyright.shouldImportPylanceSettings": "never",
-    "workbench.colorTheme": "Default Dark Modern"
+    "workbench.startupEditor": "none"
 }
