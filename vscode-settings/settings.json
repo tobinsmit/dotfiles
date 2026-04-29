@@ -11,7 +11,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[yaml]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "diffEditor.ignoreTrimWhitespace": true
     },
     "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
     "basedpyright.analysis.inlayHints.callArgumentNames": false,
@@ -181,11 +182,13 @@
     "workbench.list.smoothScrolling": true,
     "workbench.startupEditor": "none",
     "workbench.activityBar.orientation": "vertical",
-    "workbench.colorTheme": "Dark Modern",
     "update.mode": "silentlyApplyOnQuit",
     "workbench.editor.autoLockGroups": {
         "terminalEditor": false,
         "mainThreadWebview-simpleBrowser.view": false,
         "mainThreadWebview-browserPreview": false
-    }
+    },
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "cursorpyright.shouldImportPylanceSettings": "never",
+    "workbench.colorTheme": "Default Dark Modern"
 }
