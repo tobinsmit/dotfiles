@@ -96,6 +96,9 @@ tobin-prune() {
 
     # Delete the branches
     echo "$branches" | xargs git branch -D
+
+    # Run repo maintenance (gc, commit-graph, etc.)
+    git maintenance run --quiet 2>/dev/null || true
 }
 
 tobin-prune-all() {
@@ -219,12 +222,64 @@ tobin-code-list() {
     echo "$clean on master, $feature on feature branches"
 }
 
+# Delete the given newline-separated list of directories using either `trash`
+# or `rm -rf`. Honours $TOBIN_NUKE_DELETER if set (values: trash | rm),
+# otherwise prompts the user. Times the deletion loop.
+_tobin-nuke-delete-all() {
+  local matches="$1"
+  local deleter="$TOBIN_NUKE_DELETER"
+  local had_errors=0
+  local target reply
+
+  if [ -z "$deleter" ]; then
+    printf "⚠️  Delete ALL of these directories? [t]rash / [r]m -rf / [N]o "
+    read -r reply
+    case "$reply" in
+      [Tt]* ) deleter=trash ;;
+      [Rr]* ) deleter=rm ;;
+      * ) echo "❎ Aborted."; return 0 ;;
+    esac
+  fi
+
+  if [ "$deleter" = "trash" ] && ! command -v trash &> /dev/null; then
+    echo "❌ 'trash' not found. Install with: brew install trash"
+    return 1
+  fi
+
+  echo "🧨 Deleting with $deleter…"
+  SECONDS=0
+  while IFS= read -r target; do
+    [ -n "$target" ] || continue
+    if [ "$deleter" = "trash" ]; then
+      if trash "$target"; then
+        echo "  Trashed $target"
+      else
+        echo "  Failed to trash $target"
+        had_errors=1
+      fi
+    else
+      if rm -rf "$target"; then
+        echo "  Removed $target"
+      else
+        echo "  Failed to rm $target"
+        had_errors=1
+      fi
+    fi
+  done <<< "$matches"
+  echo "⏱  ${SECONDS}s"
+  if [ "$had_errors" -eq 0 ]; then
+    echo "✅ Done."
+  else
+    echo "❌ Finished with errors."
+    return 1
+  fi
+}
+
 # Delete Python venvs & cache dirs under the given path (default: .)
 tobin-python-nuke() {
   local root="${1:-.}"
   local maxdepth="${2:-10}"
   local matches
-  local had_errors=0
 
   matches="$(
     find "$root" -maxdepth "$maxdepth" -type d \
@@ -242,35 +297,42 @@ tobin-python-nuke() {
   fi
 
   echo
-  printf "⚠️  Delete ALL of these directories? [y/N] "
-  read -r reply
-  case "$reply" in
-    [Yy]* )
-      if ! command -v trash &> /dev/null; then
-        echo "❌ 'trash' not found. Install with: brew install trash"
-        return 1
-      fi
-      echo "🧨 Trashing…"
-      while IFS= read -r target; do
-        [ -n "$target" ] || continue
-        if trash "$target"; then
-          echo "  Trashed $target"
-        else
-          echo "  Failed to trash $target"
-          had_errors=1
-        fi
-      done <<< "$matches"
-      if [ "$had_errors" -eq 0 ]; then
-        echo "✅ Done."
-      else
-        echo "❌ Finished with errors."
-        return 1
-      fi
-      ;;
-    * )
-      echo "❎ Aborted."
-      ;;
-  esac
+  _tobin-nuke-delete-all "$matches"
+}
+
+# Delete orphaned pipenv virtualenvs from the shared virtualenv store.
+# pipenv keys each env to the absolute path of its project, so every deleted
+# git worktree strands its (often ~1GB) env behind with nothing pointing at it.
+# An env is orphaned when the path recorded in its .project file is gone.
+# Envs with no .project file are left alone — we only delete what we can verify.
+tobin-orphan-venv-nuke() {
+  local venv_home="${WORKON_HOME:-$HOME/.local/share/virtualenvs}"
+  local matches project d
+
+  if [ ! -d "$venv_home" ]; then
+    echo "✅ No pipenv virtualenv store at: $venv_home"
+    return 0
+  fi
+
+  matches="$(
+    for d in "$venv_home"/*/; do
+      [ -d "$d" ] || continue
+      project="$(cat "${d}.project" 2>/dev/null)"
+      [ -n "$project" ] || continue
+      [ -d "$project" ] || printf '%s\n' "${d%/}"
+    done
+  )"
+
+  echo "🔍 Searching for orphaned pipenv virtualenvs under: $venv_home"
+  printf '%s\n' "$matches"
+
+  if [ -z "$matches" ]; then
+    echo "✅ No orphaned virtualenvs found."
+    return 0
+  fi
+
+  echo
+  _tobin-nuke-delete-all "$matches"
 }
 
 # Delete node_modules dirs under the given path (default: .)
@@ -278,7 +340,6 @@ tobin-node-nuke() {
   local root="${1:-.}"
   local maxdepth="${2:-10}"
   local matches
-  local had_errors=0
 
   matches="$(
     find "$root" -maxdepth "$maxdepth" -type d -name "node_modules" -prune -print
@@ -293,35 +354,7 @@ tobin-node-nuke() {
   fi
 
   echo
-  printf "⚠️  Delete ALL of these directories? [y/N] "
-  read -r reply
-  case "$reply" in
-    [Yy]* )
-      if ! command -v trash &> /dev/null; then
-        echo "❌ 'trash' not found. Install with: brew install trash"
-        return 1
-      fi
-      echo "🧨 Trashing…"
-      while IFS= read -r target; do
-        [ -n "$target" ] || continue
-        if trash "$target"; then
-          echo "  Trashed $target"
-        else
-          echo "  Failed to trash $target"
-          had_errors=1
-        fi
-      done <<< "$matches"
-      if [ "$had_errors" -eq 0 ]; then
-        echo "✅ Done."
-      else
-        echo "❌ Finished with errors."
-        return 1
-      fi
-      ;;
-    * )
-      echo "❎ Aborted."
-      ;;
-  esac
+  _tobin-nuke-delete-all "$matches"
 }
 
 # Delete gitignored files under the given path (default: .)
@@ -352,7 +385,7 @@ tobin-gitignored-nuke() {
   local ignored_files
   ignored_files="$(
     cd "$root" &&
-    git ls-files --others -i --exclude-standard
+    git ls-files --others -i --exclude-standard --directory
   )"
   printf '%s\n' "$ignored_files"
 
@@ -362,22 +395,28 @@ tobin-gitignored-nuke() {
   fi
 
   echo
-  printf "⚠️  Delete ALL of these files? [y/N] "
-  read -r reply
+  local deleter="${TOBIN_NUKE_DELETER:-trash}"
+  local reply
+  if [ -n "$TOBIN_NUKE_DELETER" ]; then
+    reply=y
+  else
+    printf "⚠️  Delete ALL of these files? [y/N] "
+    read -r reply
+  fi
   case "$reply" in
     [Yy]* )
-      if ! command -v trash &> /dev/null; then
+      if [ "$deleter" = "trash" ] && ! command -v trash &> /dev/null; then
         echo "❌ 'trash' not found. Install with: brew install trash"
         return 1
       fi
-      echo "🧨 Trashing…"
+      echo "🧨 Deleting with $deleter…"
       cd "$root" || return 1
       while IFS= read -r target; do
         [ -n "$target" ] || continue
-        if trash "$target"; then
-          echo "  Trashed $target"
+        if { [ "$deleter" = "trash" ] && trash "$target"; } || { [ "$deleter" = "rm" ] && rm -rf "$target"; }; then
+          echo "  Deleted $target"
         else
-          echo "  Failed to trash $target"
+          echo "  Failed to delete $target"
           had_errors=1
         fi
       done <<< "$ignored_files"
@@ -399,7 +438,6 @@ tobin-gitignored-nuke() {
 tobin-empty-dir-nuke() {
   local root="${1:-.}"
   local matches
-  local had_errors=0
 
   matches="$(find "$root" -depth -type d -empty -print)"
 
@@ -412,41 +450,32 @@ tobin-empty-dir-nuke() {
   fi
 
   echo
-  printf "⚠️  Delete ALL of these directories? [y/N] "
-  read -r reply
-  case "$reply" in
-    [Yy]* )
-      if ! command -v trash &> /dev/null; then
-        echo "❌ 'trash' not found. Install with: brew install trash"
-        return 1
-      fi
-      echo "🧨 Trashing…"
-      while IFS= read -r target; do
-        [ -n "$target" ] || continue
-        if trash "$target"; then
-          echo "  Trashed $target"
-        else
-          echo "  Failed to trash $target"
-          had_errors=1
-        fi
-      done <<< "$matches"
-      if [ "$had_errors" -eq 0 ]; then
-        echo "✅ Done."
-      else
-        echo "❌ Finished with errors."
-        return 1
-      fi
-      ;;
-    * )
-      echo "❎ Aborted."
-      ;;
-  esac
+  _tobin-nuke-delete-all "$matches"
 }
 
 # Run Python, Node, gitignored, and empty-dir cleanup under the given path (default: .)
+# Usage: tobin-nuke [root] [maxdepth] [trash|rm]
+# Passing the deleter as the third argument skips every prompt, so the function
+# can be run non-interactively (e.g. from a script or an agent).
 tobin-nuke() {
   local root="${1:-.}"
   local maxdepth="${2:-10}"
+  local TOBIN_NUKE_DELETER="$3"
+  local reply
+
+  case "$TOBIN_NUKE_DELETER" in
+    trash|rm ) ;;
+    "" )
+      printf "Use [t]rash or [r]m -rf? [t/r/N] "
+      read -r reply
+      case "$reply" in
+        [Tt]* ) TOBIN_NUKE_DELETER=trash ;;
+        [Rr]* ) TOBIN_NUKE_DELETER=rm ;;
+        * ) echo "❎ Aborted."; return 0 ;;
+      esac
+      ;;
+    * ) echo "❌ Unknown deleter '$TOBIN_NUKE_DELETER' (expected 'trash' or 'rm')."; return 1 ;;
+  esac
 
   tobin-python-nuke "$root" "$maxdepth" || return $?
   echo

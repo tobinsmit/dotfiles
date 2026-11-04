@@ -10,16 +10,18 @@
         }
     },
     {
-        // New Terminal
+        // New Terminal: create in the panel (correctly wires keybinding
+        // soft-dispatch), then move to the editor area. Works around a Cursor
+        // bug where terminals created directly as editors after window load
+        // lose terminal keybindings (sendSequence, etc.).
         "key": "cmd+t",
-        "command": "workbench.action.createTerminalEditor",
-        // newWithCwd
-        // "command": "workbench.action.terminal.newWithCwd",
-        // "args": {
-        //     "cwd": "${workspaceFolderRoot}"
-        // },
-        // new
-        // "command": "workbench.action.terminal.new",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.terminal.new",
+                "workbench.action.terminal.moveToEditor"
+            ]
+        },
         "when": "terminalProcessSupported",
     },
     {
@@ -74,5 +76,19 @@
         "key": "alt+cmd+s",
         "command": "workbench.action.toggleUnifiedSidebarFromKeyboard",
         "when": "cursor.agentIdeUnification.enabled == true && !isAuxiliaryWindowFocusedContext"
+    },
+    {
+        "key": "ctrl+s",
+        "command": "workbench.action.files.saveWithoutFormatting"
+    },
+    {
+        "key": "cmd+r s",
+        "command": "-workbench.action.files.saveWithoutFormatting"
+    },
+    {
+        // Delete to start of line in the editor (matches the terminal Ctrl+U behavior)
+        "key": "cmd+backspace",
+        "command": "deleteAllLeft",
+        "when": "textInputFocus && !editorReadonly"
     },
 ]
