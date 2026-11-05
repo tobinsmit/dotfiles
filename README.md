@@ -2,6 +2,9 @@
 
 My config files live here when they're not crashing my terminal
 
+> [!WARNING]
+> **This is a public repo.** Don't commit anything personal or private: no secrets, tokens, emails, work/org identifiers, or machine-specific paths (use `~`/`$HOME`). Put machine-specific or private settings in your untracked `~/.zshrc` instead. Commits use your GitHub no-reply email (set automatically by `install_tools.sh`).
+
 ## Install
 
 ```bash
