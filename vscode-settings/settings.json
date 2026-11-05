@@ -192,6 +192,7 @@
     "workbench.iconTheme": "vscode-icons",
     "workbench.list.smoothScrolling": true,
     "terminal.integrated.gpuAcceleration": "off",
+    "terminal.integrated.initialHint": false,
     "testing.automaticallyOpenTestResults": "openOnTestFailure",
     "window.autoDetectColorScheme": false,
     "workbench.preferredDarkColorTheme": "Dark Modern",

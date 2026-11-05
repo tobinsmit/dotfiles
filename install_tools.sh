@@ -64,5 +64,24 @@ else
     echo "✅ 1password-cli already installed"
 fi
 
+# ----------------------------------------
+# VSCode / Cursor settings (symlinked to dotfiles)
+# ----------------------------------------
+
+for editor in "Code" "Cursor"; do
+    user_dir="$HOME/Library/Application Support/$editor/User"
+    [ -d "$user_dir" ] || continue
+    for f in settings.json keybindings.json; do
+        src="$HOME/.dotfiles/vscode-settings/$f"
+        dest="$user_dir/$f"
+        if [ "$(readlink "$dest")" = "$src" ]; then
+            echo "✅ $editor $f already linked"
+        else
+            ln -sf "$src" "$dest"
+            echo "✅ $editor $f linked to dotfiles"
+        fi
+    done
+done
+
 echo ""
 echo "✨ All tools installed! Open a new terminal to apply changes."

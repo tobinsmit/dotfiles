@@ -8,7 +8,7 @@ My config files live here when they're not crashing my terminal
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tobinsmit/dotfiles/main/install.sh)"
 ```
 
-Then install any missing tools the shell config expects (e.g. `.git-prompt.sh`):
+Then install any missing tools the shell config expects (e.g. `.git-prompt.sh`) and symlink VSCode/Cursor settings to this repo. Safe to re-run:
 
 ```bash
 source ~/.dotfiles/install_tools.sh
@@ -23,14 +23,14 @@ Files are not symlinked into `$HOME`. Instead, `install.sh` appends `source ~/.d
 ## Key files
 
 - **install.sh**: clones the repo to `~/.dotfiles`, backs up existing dotfiles, and sets up shell sourcing
-- **install_tools.sh**: installs tools referenced by `common_run_commands.sh` that are missing
+- **install_tools.sh**: installs tools referenced by `common_run_commands.sh` that are missing, and symlinks VSCode/Cursor settings into `vscode-settings/`
 - **common_run_commands.sh**: shell config sourced at startup: aliases, prompt, and utility functions (`tobin-prune`, `tobin-code-list`, `tobin-python-nuke`, `tobin-node-nuke`, `terminal_titles`)
 - **audit-claude-settings.py**: audits Claude Code permission rules across `~/code/` workspaces and removes duplicates of global settings
   ```bash
   uv run python audit-claude-settings.py         # dry run
   uv run python audit-claude-settings.py --apply # remove duplicates
   ```
-- **vscode-settings/**: VSCode/Cursor settings and keybindings (synced manually, not symlinked)
+- **vscode-settings/**: VSCode/Cursor settings and keybindings. The editor's user settings are symlinked here by `install_tools.sh`, so changes made in the editor land in the repo
 - **com.googlecode.iterm2.plist**: iTerm2 preferences
 
 There are no tests, linting, or build steps.
