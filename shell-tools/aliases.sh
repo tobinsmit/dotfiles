@@ -2,7 +2,6 @@
 
 # alias ls="ls -a --color=auto"
 # alias ll="ls -alD %Y-%m-%d"
-# alias lw="ls -lD %Y-%d-%m --color=auto ~/code"
 if command -v eza >/dev/null 2>&1; then
     alias ls="eza"
     alias ll="eza -laF --git-repos-no-status --group-directories-first"
