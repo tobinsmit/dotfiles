@@ -1,0 +1,29 @@
+#!/bin/bash
+# Block commits that add personal/private data to this public repo.
+# Enabled by install_tools.sh (git config core.hooksPath hooks).
+# False positive? Commit with: git commit --no-verify
+
+# Added lines only, excluding this hooks/ folder (it contains the patterns themselves)
+added="$(git diff --cached -U0 --diff-filter=ACM -- . ':!hooks/' | grep -E '^\+[^+]')"
+
+patterns=(
+    '/Users/[A-Za-z0-9._-]+'                              # machine-specific home paths (use ~ or $HOME)
+    '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'      # email addresses
+    '-----BEGIN [A-Z ]*PRIVATE KEY-----'                  # private keys
+    '(ghp_|gho_|github_pat_|sk-|xox[abp]-|AKIA)[A-Za-z0-9_-]{10,}'  # common API token prefixes
+)
+# Emails that are fine to commit
+allowed='users\.noreply\.github\.com|@example\.com|git@github\.com'
+
+found=""
+for p in "${patterns[@]}"; do
+    hits="$(echo "$added" | grep -E -- "$p" | grep -v -E "$allowed")"
+    [ -n "$hits" ] && found="$found$hits"$'\n'
+done
+
+if [ -n "$found" ]; then
+    echo "🚫 Commit blocked: this is a public repo and these added lines look personal or private:"
+    echo "$found" | sed '/^$/d' | sort -u | sed 's/^/   /'
+    echo "Fix them, or if they're safe: git commit --no-verify"
+    exit 1
+fi

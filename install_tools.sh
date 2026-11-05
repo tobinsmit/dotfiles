@@ -67,6 +67,19 @@ else
 fi
 
 # ----------------------------------------
+# Pre-commit check against committing personal data (public repo)
+# ----------------------------------------
+
+if [ "$(git -C "$DOTFILES_DIR" config core.hooksPath)" = "hooks" ]; then
+    echo "✅ pre-commit privacy check already enabled"
+    _present=$((_present + 1))
+else
+    git -C "$DOTFILES_DIR" config core.hooksPath hooks
+    echo "✅ pre-commit privacy check enabled"
+    _installed=$((_installed + 1))
+fi
+
+# ----------------------------------------
 # VSCode / Cursor settings (symlinked to dotfiles)
 # ----------------------------------------
 

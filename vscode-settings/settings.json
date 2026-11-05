@@ -97,7 +97,6 @@
     "errorLens.enabled": false,
     "explorer.confirmDragAndDrop": false,
     "explorer.sortOrder": "type",
-    "files.dialog.defaultPath": "~/code",
     "git.autofetch": true,
     "git.blame.editorDecoration.enabled": true,
     "git.confirmSync": false,
@@ -139,14 +138,6 @@
     "security.promptForLocalFileProtocolHandling": false,
     "security.workspace.trust.untrustedFiles": "open",
     "sonarlint.automaticAnalysis": true,
-    "sonarlint.connectedMode.connections.sonarcloud": [
-        {
-            "connectionId": "work-org",
-            "disableNotifications": true,
-            "organizationKey": "work-org",
-            "region": "EU"
-        }
-    ],
     "sonarlint.focusOnNewCode": false,
     "terminal.external.osxExec": "iTerm.app",
     "terminal.integrated.allowChords": true,
