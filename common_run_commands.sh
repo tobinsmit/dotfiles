@@ -504,7 +504,7 @@ if [ -f "$HOME/.git-prompt.sh" ]; then
 else
     # Fallback to old prompt if git-prompt.sh is not available
     MISSING_TOOLS="$MISSING_TOOLS  .git-prompt.sh \n"
-    PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %F{141}%# %f%b'
+    setopt PROMPT_SUBST ; PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %F{141}%# %f%b'
 fi
 
 # ----------------------------------------
