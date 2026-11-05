@@ -8,7 +8,9 @@ My config files live here when they're not crashing my terminal
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tobinsmit/dotfiles/main/install_dotfiles.sh)"
 ```
 
-Then install any missing tools the shell config expects (e.g. `.git-prompt.sh`) and symlink VSCode/Cursor settings to this repo. Safe to re-run:
+This backs up existing dotfiles, clones the repo over HTTPS (then switches `origin` to SSH for pushing), and runs `install_tools.sh`. Re-running it is safe: an existing clone is fast-forwarded, never deleted.
+
+To just install missing tools, set git identity, and link editor settings (also safe to re-run):
 
 ```bash
 source ~/.dotfiles/install_tools.sh
@@ -23,7 +25,8 @@ Files are not symlinked into `$HOME`. Instead, `install_dotfiles.sh` appends `so
 ## Key files
 
 - **install_dotfiles.sh**: backs up existing dotfiles to `~/.dotfiles-backups/<timestamp>/` (never pruned), clones the repo to `~/.dotfiles`, and sets up shell sourcing
-- **install_tools.sh**: installs tools referenced by `common_run_commands.sh` that are missing, and symlinks VSCode/Cursor settings into `vscode-settings/`
+- **install_tools.sh**: installs missing tools (needs Homebrew), sets git name and GitHub no-reply email from the GitHub API if unset, and symlinks VSCode/Cursor settings into `vscode-settings/`
+- **tools.sh**: the list of tools the shell config expects. Add new tools here; both the startup "missing tools" warning and `install_tools.sh` read it
 - **common_run_commands.sh**: shell config sourced at startup: aliases, prompt, and utility functions (`tobin-prune`, `tobin-code-list`, `tobin-python-nuke`, `tobin-node-nuke`, `terminal_titles`)
 - **audit-claude-settings.py**: audits Claude Code permission rules across `~/code/` workspaces and removes duplicates of global settings
   ```bash

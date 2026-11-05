@@ -4,8 +4,9 @@
 
 # It will:
 # - backup your existing dotfiles
-# - clone the repository to $HOME/.dotfiles
+# - clone the repository to $HOME/.dotfiles (or update it in place if already there)
 # - set up common run commands
+# - run install_tools.sh (tools, git identity, editor settings)
 
 # We don't need return codes for "$(command)", only stdout is needed.
 # shellcheck disable=SC2312
@@ -14,7 +15,9 @@ set -e  # Exit on error
 set -u  # Treat unset variables as errors
 
 # Define variables
-DOTFILES_REPO_SOURCE="git@github.com:tobinsmit/dotfiles.git"
+# Clone/fetch over HTTPS (works before an SSH key exists); origin is then switched to SSH for pushing
+DOTFILES_REPO_HTTPS="https://github.com/tobinsmit/dotfiles.git"
+DOTFILES_REPO_SSH="git@github.com:tobinsmit/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 BACKUP_ROOT="$HOME/.dotfiles-backups" # must live outside $DOTFILES_DIR, which gets re-cloned
 BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d_%H%M%S)"
@@ -143,12 +146,35 @@ backup_existing_dotfiles() {
   echo "✅ Backup created at $BACKUP_DIR"
 }
 
-# Clone the dotfiles repository
+# Update an existing clone in place: fast-forward only, never discards local work
+update_repo() {
+  ohai "Updating existing dotfiles repository..."
+  local branch
+  branch="$(git -C "$DOTFILES_DIR" branch --show-current)"
+  if [[ "$branch" != "main" ]]; then
+    warn "$DOTFILES_DIR is on branch '$branch', not main. Skipping update."
+    return
+  fi
+  # Fetch over HTTPS so this works even without an SSH key; keep origin/main tracking current
+  if git -C "$DOTFILES_DIR" fetch "$DOTFILES_REPO_HTTPS" "+refs/heads/main:refs/remotes/origin/main" \
+     && git -C "$DOTFILES_DIR" merge --ff-only origin/main; then
+    echo "✅ Updated to latest main"
+  else
+    warn "Couldn't fast-forward $DOTFILES_DIR (local changes or diverged history). Left as-is; resolve with git."
+  fi
+}
+
+# Clone the dotfiles repository, or update it if it's already there
 clone_repo() {
+  if [ -d "$DOTFILES_DIR/.git" ]; then
+    update_repo
+    return
+  fi
+
   ohai "Cloning dotfiles repository..."
-  if [ -d "$DOTFILES_DIR" ]; then
-    warn "Directory $DOTFILES_DIR already exists!"
-    echo -n "Would you like to remove it and clone again? (y/n) "
+  if [ -e "$DOTFILES_DIR" ]; then
+    warn "$DOTFILES_DIR exists but isn't a git repo (a copy is in $BACKUP_DIR)."
+    echo -n "Would you like to remove it and clone? (y/n) "
     if [[ -z "${NONINTERACTIVE-}" ]]; then
       read -r response
       if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -161,9 +187,18 @@ clone_repo() {
       rm -rf "$DOTFILES_DIR"
     fi
   fi
-  
-  git clone "$DOTFILES_REPO_SOURCE" "$DOTFILES_DIR"
-  echo "✅ Cloned and configured"
+
+  git clone "$DOTFILES_REPO_HTTPS" "$DOTFILES_DIR"
+  git -C "$DOTFILES_DIR" remote set-url origin "$DOTFILES_REPO_SSH"
+  echo "✅ Cloned (origin set to $DOTFILES_REPO_SSH for pushing; needs a GitHub SSH key)"
+}
+
+# Install tools, git identity and editor settings
+run_install_tools() {
+  ohai "Running install_tools.sh..."
+  if ! zsh "$DOTFILES_DIR/install_tools.sh"; then
+    warn "install_tools.sh had problems. Re-run with: source ~/.dotfiles/install_tools.sh"
+  fi
 }
 
 # Set up run commands
@@ -203,11 +238,12 @@ setup_run_commands() {
 }
 
 # Main execution
-ohai "This script will install dotfiles from $DOTFILES_REPO_SOURCE"
+ohai "This script will install dotfiles from $DOTFILES_REPO_HTTPS"
 ohai "It will:"
-echo "- Back up your existing $DOTFILES_DIR to $BACKUP_DIR"
-echo "- Clone and configure the repository to $DOTFILES_DIR"
+echo "- Back up your existing dotfiles to $BACKUP_DIR"
+echo "- Clone the repository to $DOTFILES_DIR (or update it if already there)"
 echo "- Set up common run commands"
+echo "- Install missing tools, git identity and editor settings (install_tools.sh)"
 
 if [[ -z "${NONINTERACTIVE-}" ]]; then
   wait_for_user
@@ -217,7 +253,8 @@ main() {
   backup_existing_dotfiles
   clone_repo
   setup_run_commands
-  
+  run_install_tools
+
   ohai "🎉 Dotfiles installation complete!"
   ohai "What's next:"
   echo "1. Source your shell configuration: "

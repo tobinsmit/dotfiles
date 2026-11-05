@@ -1,7 +1,8 @@
 # .zshrc: Run at start of every interactive shell
 # Typically used for shell setup, aliases, functions, prompts, key bindings etc
 
-MISSING_TOOLS=""
+# Tool list + install checks shared with install_tools.sh (also puts Homebrew on PATH)
+source "$HOME/.dotfiles/tools.sh"
 
 export HISTSIZE=100000
 export SAVEHIST=100000
@@ -15,8 +16,12 @@ unset CLAUDE_CODE_DISABLE_AUTO_MEMORY
 # alias ls="ls -a --color=auto"
 # alias ll="ls -alD %Y-%m-%d"
 # alias lw="ls -lD %Y-%d-%m --color=auto ~/code"
-alias ls="eza"
-alias ll="eza -laF --git-repos-no-status --group-directories-first"
+if command -v eza >/dev/null 2>&1; then
+    alias ls="eza"
+    alias ll="eza -laF --git-repos-no-status --group-directories-first"
+else
+    alias ll="ls -laF"  # fallback until eza is installed
+fi
 # alias lr="eza -l --git-repos-no-status"
 # alias py="$(brew --prefix)/opt/python@3.10/bin/python3.10"
 
@@ -503,7 +508,6 @@ if [ -f "$HOME/.git-prompt.sh" ]; then
     setopt PROMPT_SUBST ; PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %b%F{yellow}$(git_prompt)%B%F{141}%# %f%b'
 else
     # Fallback to old prompt if git-prompt.sh is not available
-    MISSING_TOOLS="$MISSING_TOOLS  .git-prompt.sh \n"
     setopt PROMPT_SUBST ; PS1='%F{green}${PROMPT_LABEL:-ts} %B%F{cyan}%~ %F{141}%# %f%b'
 fi
 
@@ -515,41 +519,25 @@ fi
 autoload -Uz compinit && compinit
 
 # Fuzzy finder (fzf)
-if which fzf >/dev/null 2>&1; then
+if dotfiles_tool_installed fzf; then
     source <(fzf --zsh)
-else
-    MISSING_TOOLS="$MISSING_TOOLS  fzf \n"
 fi
 
 # Syntax highlighting
-zsh_high_path="$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-if [ -f "$zsh_high_path" ]; then
-    source "$zsh_high_path"
-else
-    MISSING_TOOLS="$MISSING_TOOLS  zsh-syntax-highlighting \n"
+if dotfiles_tool_installed zsh-syntax-highlighting; then
+    source "$(dotfiles_zsh_highlight_path)"
 fi
 
-# Check if alt-tab not installed via brew
-if [ ! -d "/Applications/AltTab.app" ]; then
-    MISSING_TOOLS="$MISSING_TOOLS  alt-tab \n"
-fi
-
-# Check if 1password-cli is installed
-if ! which op >/dev/null 2>&1; then
-    MISSING_TOOLS="$MISSING_TOOLS  1password-cli \n"
-fi
-
-# Check if coreutils is installed via brew
-# Mostly just want it for timeout
-# if ! brew list --formula | grep -q coreutils; then
-#     MISSING_TOOLS="$MISSING_TOOLS  coreutils \n"
-# fi
-
-if [ -n "$MISSING_TOOLS" ]; then
-    echo "\n🥵 Missing tools:"
-    echo "$MISSING_TOOLS"
+# Warn about any tools from tools.sh that aren't installed
+MISSING_TOOLS=()
+for tool in "${DOTFILES_TOOLS[@]}"; do
+    dotfiles_tool_installed "$tool" || MISSING_TOOLS+=("$tool")
+done
+unset tool
+if [ ${#MISSING_TOOLS[@]} -gt 0 ]; then
+    echo "\n🥵 Missing tools: ${MISSING_TOOLS[*]}"
     echo "✨ To install missing tools, run:"
-    echo "  source ~/.dotfiles/install_tools.sh"
+    echo "  source ~/.dotfiles/install_tools.sh\n"
 fi
 
 
