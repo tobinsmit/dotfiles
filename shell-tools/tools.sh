@@ -1,6 +1,6 @@
-# Single source of truth for the tools common_run_commands.sh expects.
-# Sourced by common_run_commands.sh (to warn about missing tools) and by
-# install_tools.sh (to install them). Add new tools here only.
+# Single source of truth for the tools the shell config expects.
+# Sourced at shell startup via common_run_commands.sh (prompt.sh warns about
+# missing tools) and by install_tools.sh (to install them). Add new tools here only.
 
 DOTFILES_TOOLS=(git-prompt eza fzf zsh-syntax-highlighting alt-tab 1password-cli)
 

@@ -1,16 +1,16 @@
 #!/bin/zsh
 
-# Install missing tools referenced in common_run_commands.sh, set up git identity,
-# and symlink editor settings. Safe to re-run: anything already done is skipped.
+# Install missing tools listed in shell-tools/tools.sh, set up git identity,
+# and set up app settings (VSCode/Cursor symlinks, iTerm2 prefs folder). Safe to re-run: anything already done is skipped.
 # Usage: source ~/.dotfiles/install_tools.sh
 
 DOTFILES_DIR="$HOME/.dotfiles"
-source "$DOTFILES_DIR/tools.sh"
+source "$DOTFILES_DIR/shell-tools/tools.sh"
 
 _installed=0 _present=0 _failed=()
 
 # ----------------------------------------
-# Tools (list lives in tools.sh)
+# Tools (list lives in shell-tools/tools.sh)
 # ----------------------------------------
 
 _have_brew=1
@@ -67,16 +67,22 @@ else
 fi
 
 # ----------------------------------------
-# Pre-commit check against committing personal data (public repo)
+# iTerm2 settings (iTerm2 loads its prefs from apps/iterm2/)
 # ----------------------------------------
 
-if [ "$(git -C "$DOTFILES_DIR" config core.hooksPath)" = "hooks" ]; then
-    echo "✅ pre-commit privacy check already enabled"
-    _present=$((_present + 1))
-else
-    git -C "$DOTFILES_DIR" config core.hooksPath hooks
-    echo "✅ pre-commit privacy check enabled"
-    _installed=$((_installed + 1))
+if [ -d "/Applications/iTerm.app" ]; then
+    _iterm_dir="$DOTFILES_DIR/apps/iterm2"
+    if [ "$(defaults read com.googlecode.iterm2 PrefsCustomFolder 2>/dev/null)" = "$_iterm_dir" ] \
+       && [ "$(defaults read com.googlecode.iterm2 LoadPrefsFromCustomFolder 2>/dev/null)" = "1" ]; then
+        echo "✅ iTerm2 already loads settings from dotfiles"
+        _present=$((_present + 1))
+    else
+        defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$_iterm_dir"
+        defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+        echo "✅ iTerm2 set to load settings from dotfiles (takes effect next time iTerm2 starts)"
+        _installed=$((_installed + 1))
+    fi
+    unset _iterm_dir
 fi
 
 # ----------------------------------------
@@ -87,7 +93,7 @@ for editor in "Code" "Cursor"; do
     user_dir="$HOME/Library/Application Support/$editor/User"
     [ -d "$user_dir" ] || continue
     for f in settings.json keybindings.json; do
-        src="$DOTFILES_DIR/vscode-settings/$f"
+        src="$DOTFILES_DIR/apps/vscode/$f"
         dest="$user_dir/$f"
         if [ "$(readlink "$dest")" = "$src" ]; then
             echo "✅ $editor $f already linked"

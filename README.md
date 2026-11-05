@@ -3,7 +3,7 @@
 My config files live here when they're not crashing my terminal
 
 > [!WARNING]
-> **This is a public repo.** Don't commit anything personal or private: no secrets, tokens, emails, work/org identifiers, or machine-specific paths (use `~`/`$HOME`). Put machine-specific or private settings in your untracked `~/.zshrc` instead. Commits use your GitHub no-reply email (set automatically by `install_tools.sh`), and a pre-commit check (`hooks/pre-commit`) blocks home paths, emails, and common token formats.
+> **This is a public repo.** Don't commit anything personal or private: no secrets, tokens, emails, work/org identifiers, or machine-specific paths (use `~`/`$HOME`). Put machine-specific or private settings in your untracked `~/.zshrc` instead. Commits use your GitHub no-reply email (set automatically by `install_tools.sh`).
 
 ## Install
 
@@ -25,19 +25,20 @@ This is a regular git repo cloned to `~/.dotfiles`. Use plain `git` from inside 
 
 Files are not symlinked into `$HOME`. Instead, `install_dotfiles.sh` appends `source ~/.dotfiles/common_run_commands.sh` to your shell config (e.g. `~/.zshrc`). That shell config stays untracked and machine-specific, e.g. for setting `PROMPT_LABEL`.
 
-## Key files
+## Layout
 
-- **install_dotfiles.sh**: backs up existing dotfiles to `~/.dotfiles-backups/<timestamp>/` (never pruned), clones the repo to `~/.dotfiles`, and sets up shell sourcing
-- **install_tools.sh**: installs missing tools (needs Homebrew), sets git name and GitHub no-reply email from the GitHub API if unset, and symlinks VSCode/Cursor settings into `vscode-settings/`
-- **tools.sh**: the list of tools the shell config expects. Add new tools here; both the startup "missing tools" warning and `install_tools.sh` read it
-- **common_run_commands.sh**: shell config sourced at startup: aliases, prompt, and utility functions (`tobin-prune`, `tobin-code-list`, `tobin-python-nuke`, `tobin-node-nuke`, `terminal_titles`)
-- **audit-claude-settings.py**: audits Claude Code permission rules across `~/code/` workspaces and removes duplicates of global settings
-  ```bash
-  uv run python audit-claude-settings.py         # dry run
-  uv run python audit-claude-settings.py --apply # remove duplicates
-  ```
-- **vscode-settings/**: VSCode/Cursor settings and keybindings. The editor's user settings are symlinked here by `install_tools.sh`, so changes made in the editor land in the repo
-- **com.googlecode.iterm2.plist**: iTerm2 preferences
+| Path | What it is | Where to add things |
+|---|---|---|
+| `install_dotfiles.sh` | Backs up existing dotfiles to `~/.dotfiles-backups/<timestamp>/` (never pruned), clones or updates the repo, sets up shell sourcing, runs `install_tools.sh` | |
+| `install_tools.sh` | Installs missing tools (needs Homebrew), sets git name + GitHub no-reply email from the GitHub API if unset, links VSCode/Cursor settings, points iTerm2 at its settings folder | New app setup steps |
+| `common_run_commands.sh` | Entry point sourced from `~/.zshrc`; loads `shell-tools/*.sh` | Nothing (keep it tiny) |
+| `shell-tools/tools.sh` | List of tools the shell expects, with install checks. Read by the startup warning and `install_tools.sh` | New tools |
+| `shell-tools/aliases.sh` | Aliases | New aliases |
+| `shell-tools/functions.sh` | Shell functions: `tobin-prune`, `tobin-code-list`, `tobin-*-nuke`, `terminal_titles` | New functions |
+| `shell-tools/prompt.sh` | Prompt, completion, fzf, syntax highlighting, missing-tools warning | Prompt / add-on changes |
+| `shell-tools/audit-claude-settings.py` | Audits Claude Code permission rules across `~/code/` and removes duplicates of global settings: `uv run python ~/.dotfiles/shell-tools/audit-claude-settings.py [--apply]` | |
+| `apps/vscode/` | VSCode/Cursor settings and keybindings, **symlinked** into the editor, so changes made in the editor land in the repo | |
+| `apps/iterm2/` | iTerm2 settings. iTerm2 **loads them from this folder** (set by `install_tools.sh`) | |
 
 There are no tests, linting, or build steps.
 
