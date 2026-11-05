@@ -16,7 +16,8 @@ set -u  # Treat unset variables as errors
 # Define variables
 DOTFILES_REPO_SOURCE="git@github.com:tobinsmit/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
-BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+BACKUP_ROOT="$HOME/.dotfiles-backups" # must live outside $DOTFILES_DIR, which gets re-cloned
+BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d_%H%M%S)"
 NONINTERACTIVE=${NONINTERACTIVE:-}
 CI=${CI:-} # CI is set by GitHub Actions
 

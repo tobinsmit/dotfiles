@@ -22,7 +22,7 @@ Files are not symlinked into `$HOME`. Instead, `install.sh` appends `source ~/.d
 
 ## Key files
 
-- **install.sh**: clones the repo to `~/.dotfiles`, backs up existing dotfiles, and sets up shell sourcing
+- **install.sh**: backs up existing dotfiles to `~/.dotfiles-backups/<timestamp>/` (never pruned), clones the repo to `~/.dotfiles`, and sets up shell sourcing
 - **install_tools.sh**: installs tools referenced by `common_run_commands.sh` that are missing, and symlinks VSCode/Cursor settings into `vscode-settings/`
 - **common_run_commands.sh**: shell config sourced at startup: aliases, prompt, and utility functions (`tobin-prune`, `tobin-code-list`, `tobin-python-nuke`, `tobin-node-nuke`, `terminal_titles`)
 - **audit-claude-settings.py**: audits Claude Code permission rules across `~/code/` workspaces and removes duplicates of global settings
